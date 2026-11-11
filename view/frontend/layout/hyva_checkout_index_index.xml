@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright (c) Yuriy Boyko <info@yuriy-boyko.com>
+ * Licensed under the Open Software License version 3.0
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Customer attributes shown in the checkout, one section per position (one-page checkout containers) -->
+        <referenceContainer name="checkout.shipping-details.before">
+            <block name="mageos.cca.checkout.shipping_address_above"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingAddressAbove</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.shipping-details.section">
+            <block name="mageos.cca.checkout.shipping_address_below"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml" after="checkout.shipping-details">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingAddressBelow</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.shipping.methods.before">
+            <block name="mageos.cca.checkout.shipping_methods_above"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingMethodsAbove</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.shipping.methods.after">
+            <block name="mageos.cca.checkout.shipping_methods_below"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingMethodsBelow</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.payment.methods.before">
+            <block name="mageos.cca.checkout.payment_above"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutPaymentAbove</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.payment.methods.after">
+            <block name="mageos.cca.checkout.payment_below"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutPaymentBelow</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.price-summary.section">
+            <block name="mageos.cca.checkout.order_summary"
+                   template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml" after="price-summary.total-segments">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">MageOSCcaCheckoutOrderSummary</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

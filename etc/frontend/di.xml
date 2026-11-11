@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright (c) Yuriy Boyko <info@yuriy-boyko.com>
+ * Licensed under the Open Software License version 3.0
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Hyva\Checkout\Model\Form\EntityForm\EavAttributeShippingAddressForm">
+        <arguments>
+            <argument name="entityFormModifiers" xsi:type="array">
+                <item name="mageos_cca_visibility" sortOrder="700" xsi:type="object">MageOS\CustomerCustomAttributesHyvaCheckout\Model\AttributeVisibilityModifier</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Hyva\Checkout\Model\Form\EntityForm\EavAttributeBillingAddressForm">
+        <arguments>
+            <argument name="entityFormModifiers" xsi:type="array">
+                <item name="mageos_cca_visibility" sortOrder="700" xsi:type="object">MageOS\CustomerCustomAttributesHyvaCheckout\Model\AttributeVisibilityModifier</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Customer attributes at the position "shipping_address_above" -->
+    <virtualType name="MageOSCcaCheckoutShippingAddressAbove" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">shipping_address_above</argument>
+        </arguments>
+    </virtualType>
+    <!-- Customer attributes at the position "shipping_address_below" -->
+    <virtualType name="MageOSCcaCheckoutShippingAddressBelow" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">shipping_address_below</argument>
+        </arguments>
+    </virtualType>
+    <!-- Customer attributes at the position "shipping_methods_above" -->
+    <virtualType name="MageOSCcaCheckoutShippingMethodsAbove" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">shipping_methods_above</argument>
+        </arguments>
+    </virtualType>
+    <!-- Customer attributes at the position "shipping_methods_below" -->
+    <virtualType name="MageOSCcaCheckoutShippingMethodsBelow" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">shipping_methods_below</argument>
+        </arguments>
+    </virtualType>
+    <!-- Customer attributes at the position "payment_above" -->
+    <virtualType name="MageOSCcaCheckoutPaymentAbove" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">payment_above</argument>
+        </arguments>
+    </virtualType>
+    <!-- Customer attributes at the position "payment_below" -->
+    <virtualType name="MageOSCcaCheckoutPaymentBelow" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">payment_below</argument>
+        </arguments>
+    </virtualType>
+    <!-- Customer attributes at the position "order_summary" -->
+    <virtualType name="MageOSCcaCheckoutOrderSummary" type="MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes">
+        <arguments>
+            <argument name="position" xsi:type="string">order_summary</argument>
+        </arguments>
+    </virtualType>
+</config>

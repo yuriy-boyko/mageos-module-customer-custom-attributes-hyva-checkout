@@ -1,0 +1,31 @@
+<?php
+/**
+ * Copyright (c) Yuriy Boyko <info@yuriy-boyko.com>
+ * Licensed under the Open Software License version 3.0
+ */
+declare(strict_types=1);
+
+use MageOS\CustomerCustomAttributesHyvaCheckout\Magewire\CustomerAttributes;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var CustomerAttributes $magewire */
+
+$fields = $magewire->getFields();
+?>
+<div data-mageos-cca-customer="<?= $escaper->escapeHtmlAttr($magewire->getPosition()) ?>">
+<?php if ($fields !== []): ?>
+    <div class="space-y-4 my-4 mageos-cca-checkout">
+        <?php foreach ($fields as $field): ?>
+            <div class="mageos-cca-field<?= $field['visible'] ? '' : ' hidden' ?>" data-code="<?= $escaper->escapeHtmlAttr($field['code']) ?>">
+                <?= /* @noEscape */ $block->getLayout()->createBlock(Template::class)
+                    ->setTemplate('MageOS_CustomerCustomAttributes::form/field.phtml')
+                    ->setData('field', $field)
+                    ->toHtml() ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+</div>

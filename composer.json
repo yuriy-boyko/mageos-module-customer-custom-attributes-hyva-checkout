@@ -1,0 +1,30 @@
+{
+    "name": "mage-os/module-customer-custom-attributes-hyva-checkout",
+    "description": "Hyvä Checkout integration for mage-os/module-customer-custom-attributes: shows and hides the custom address attributes in the Hyvä Checkout address forms",
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "authors": [
+        {
+            "name": "Yuriy Boyko",
+            "email": "info@yuriy-boyko.com"
+        }
+    ],
+    "require": {
+        "php": "~8.3.0||~8.4.0||~8.5.0",
+        "hyva-themes/magento2-hyva-checkout": "*",
+        "mage-os/module-customer-custom-attributes": "*",
+        "magento/framework": "*",
+        "magento/module-checkout": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MageOS\\CustomerCustomAttributesHyvaCheckout\\": ""
+        }
+    }
+}

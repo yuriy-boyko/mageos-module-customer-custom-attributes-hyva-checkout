@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright (c) Yuriy Boyko <info@yuriy-boyko.com>
+ * Licensed under the Open Software License version 3.0
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="hyva_config_generate_before">
+        <observer name="mageos_cca_hyva_checkout_register_for_hyva_config"
+                  instance="MageOS\CustomerCustomAttributesHyvaCheckout\Observer\RegisterModuleForHyvaConfig"/>
+    </event>
+</config>
