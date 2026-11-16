@@ -71,6 +71,12 @@ class AttributeVisibilityModifier implements EntityFormModifierInterface
         return $form;
     }
 
+    private function isCheckboxGroup(object $attribute): bool
+    {
+        return $this->rulesBuilder->getDisplay((string) $attribute->getFrontendInput(), (array) $attribute->getValidateRules())
+            === ValidateRulesBuilder::DISPLAY_CHECKBOX;
+    }
+
     private function setHiddenClass(object $field, bool $hidden): void
     {
         $classes = (array) ($field->getData(EntityFormElementInterface::CLASS_WRAPPER) ?? []);
@@ -85,7 +91,8 @@ class AttributeVisibilityModifier implements EntityFormModifierInterface
     {
         $codes = [];
         $values = [];
-        foreach ($this->attributeProvider->getUserDefined() as $code => $attribute) {
+        $attributes = $this->attributeProvider->getUserDefined();
+        foreach ($attributes as $code => $attribute) {
             $field = $form->getField($code);
             if ($field === null) {
                 continue;
@@ -114,6 +121,9 @@ class AttributeVisibilityModifier implements EntityFormModifierInterface
             $this->setHiddenClass($field, !isset($visible[$code]));
             if (!isset($visible[$code])) {
                 $field->setValue(null);
+            } elseif ($this->isCheckboxGroup($attributes[$code])) {
+                // A group of checkboxes needs a list as its starting value: with null the browser sends a single true for a ticked box.
+                $field->setValue($this->normalizer->toList($field->getValue()));
             }
         }
         return $form;
