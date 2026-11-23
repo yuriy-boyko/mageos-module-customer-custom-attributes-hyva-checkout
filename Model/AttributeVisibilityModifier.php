@@ -7,10 +7,12 @@ declare(strict_types=1);
 
 namespace MageOS\CustomerCustomAttributesHyvaCheckout\Model;
 
+use Hyva\Checkout\Magewire\Component\AbstractAddressForm;
+use Hyva\Checkout\Model\Form\AbstractEntityForm;
+use Hyva\Checkout\Model\Form\AbstractEntityFormModifier;
 use Hyva\Checkout\Model\Form\EntityFieldInterface;
 use Hyva\Checkout\Model\Form\EntityFormElementInterface;
 use Hyva\Checkout\Model\Form\EntityFormInterface;
-use Hyva\Checkout\Model\Form\EntityFormModifierInterface;
 use MageOS\CustomerCustomAttributes\Model\AddressAttributeProvider;
 use MageOS\CustomerCustomAttributes\Model\Dependency\RuleProvider;
 use MageOS\CustomerCustomAttributes\Service\ValidateRulesBuilder;
@@ -22,15 +24,26 @@ use Magento\Checkout\Model\Session as CheckoutSession;
  * Hyvä Checkout shipping and billing address forms: hides the custom address attributes whose dependency rule or customer
  * group restriction does not apply, and shows them again when it does.
  *
- * - After the form is filled (form:boot) and after every update (form:updated) the visible attributes are worked out from the
- *   current values with the shared VisibilityResolver and the value of a hidden attribute is cleared.
+ * - After the form is filled (boot) and after every update the visible attributes are worked out from the current values with
+ *   the shared VisibilityResolver and the value of a hidden attribute is cleared.
+ * - Hooks: the Magewire components of the Form API (`AbstractForm`, the address forms of Hyvä Checkout 3 and the alternative
+ *   shipping form of 1.3) dispatch `form:boot:magewire` and `form:updated:magewire` (Checkout 3 syncs field values a listener changes back to
+ *   the component data). The 1.x address components (`AbstractMagewireAddressForm`, the default on 1.3) dispatch only the bare
+ *   `form:boot` and `form:updated`. On 1.x both are listened to. Hyvä Checkout 3 re-emits the bare hooks itself as deprecated
+ *   copies, so there only the `:magewire` hooks are used.
  * - An attribute the customer group may not see is not rendered at all (that cannot change while the customer edits).
  * - An attribute hidden only by a dependency rule is rendered with a "hidden" wrapper class, so the browser script
  *   (MageOS_CustomerCustomAttributes::hyva-checkout/visibility.phtml) can show and hide it instantly in both directions with no request.
  *   The server only sets this starting state and clears the values.
+ * - While hidden by a rule a required attribute is not required (Checkout 3 enforces required fields it sees as visible on submit,
+ *   and the wrapper class does not make a field invisible to it). A required attribute carries `data-mageos-cca-required`, so the
+ *   browser script sets `required` again when it shows the field.
  */
-class AttributeVisibilityModifier implements EntityFormModifierInterface
+class AttributeVisibilityModifier extends AbstractEntityFormModifier
 {
+    private const DATA_REQUIRED = 'mageos_cca_required';
+    private const REMOVED_ITEM = '__rm__';
+
     public function __construct(
         private readonly RuleProvider $ruleProvider,
         private readonly VisibilityResolver $resolver,
@@ -41,19 +54,41 @@ class AttributeVisibilityModifier implements EntityFormModifierInterface
     ) {
     }
 
-    public function apply(EntityFormInterface $form): EntityFormInterface
+    public function apply(AbstractEntityForm $form): AbstractEntityForm
     {
-        // The form is always the first argument of a modification listener.
-        $resolve = fn (EntityFormInterface $form): EntityFormInterface => $this->resolve($form);
+        // The form is always the first argument of a modification listener. Hooks pass more, also as named arguments (the
+        // component, "property" and "value"): the listeners accept and ignore them, otherwise PHP would end the request with
+        // "Unknown named parameter".
+        $resolve = fn (EntityFormInterface $form, mixed ...$rest): EntityFormInterface => $this->resolve($form);
         // Dropdown, yes/no and multiple select attributes set to display as radio buttons or checkboxes use our group renderer.
         $form->registerModificationListener(
             'mageos_cca_choice_display',
             'form:build',
-            fn (EntityFormInterface $form): EntityFormInterface => $this->applyChoiceDisplay($form)
+            fn (EntityFormInterface $form, mixed ...$rest): EntityFormInterface => $this->applyChoiceDisplay($form)
         );
-        $form->registerModificationListener('mageos_cca_visibility_boot', 'form:boot', $resolve);
-        $form->registerModificationListener('mageos_cca_visibility_updated', 'form:updated', $resolve);
+        $form->registerModificationListener('mageos_cca_visibility_boot_magewire', 'form:boot:magewire', $resolve);
+        $form->registerModificationListener('mageos_cca_visibility_updated_magewire', 'form:updated:magewire', $resolve);
+        // Checkout 3 refuses an empty required field it sees as visible when the form is submitted: resolve once more with the
+        // submitted values first, so a field hidden by a rule is not required then.
+        $form->registerModificationListener('mageos_cca_visibility_submitting_magewire', 'form:submitting:magewire', $resolve);
+        // Render time: also covers forms opened after boot (the new address dialog), whose checkbox groups must start as lists.
+        $form->registerModificationListener('mageos_cca_visibility_build_magewire', 'form:build:magewire', $resolve);
+        if (!self::reEmitsLegacyHooks()) {
+            // Hyvä Checkout 1.x: the 1.x address components dispatch only these. The alternative shipping form dispatches both;
+            // resolving twice gives the same result.
+            $form->registerModificationListener('mageos_cca_visibility_boot', 'form:boot', $resolve);
+            $form->registerModificationListener('mageos_cca_visibility_updated', 'form:updated', $resolve);
+        }
         return $form;
+    }
+
+    /**
+     * Whether Hyvä Checkout dispatches the bare 1.x hooks itself as deprecated copies of the `:magewire` hooks (Checkout 3).
+     * A listener on them would then run twice and be reported by "Log Deprecated Form Hook Usage".
+     */
+    private static function reEmitsLegacyHooks(): bool
+    {
+        return method_exists(AbstractAddressForm::class, 'dispatchLegacyModificationHook');
     }
 
     private function applyChoiceDisplay(EntityFormInterface $form): EntityFormInterface
@@ -112,6 +147,16 @@ class AttributeVisibilityModifier implements EntityFormModifierInterface
 
         foreach ($codes as $code) {
             $field = $form->getField($code);
+            // Whether the attribute is required when it is shown, remembered before the first change in this request
+            $required = $field->getData(self::DATA_REQUIRED);
+            if ($required === null) {
+                $required = $field->isRequired();
+                $field->setData(self::DATA_REQUIRED, $required);
+            }
+            $field->setData(EntityFieldInterface::IS_REQUIRED, $required && isset($visible[$code]));
+            if ($required) {
+                $field->setAttribute('data-mageos-cca-required', '1');
+            }
             if (!isset($allowed[$code])) {
                 $field->hide();
                 $field->setValue(null);
@@ -123,7 +168,11 @@ class AttributeVisibilityModifier implements EntityFormModifierInterface
                 $field->setValue(null);
             } elseif ($this->isCheckboxGroup($attributes[$code])) {
                 // A group of checkboxes needs a list as its starting value: with null the browser sends a single true for a ticked box.
-                $field->setValue($this->normalizer->toList($field->getValue()));
+                // Magewire 3 sends an unticked box of a list as the marker "__rm__" (remove this item): it is not a value.
+                $field->setValue(array_values(array_filter(
+                    $this->normalizer->toList($field->getValue()),
+                    static fn ($item): bool => $item !== self::REMOVED_ITEM
+                )));
             }
         }
         return $form;

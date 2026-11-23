@@ -1,0 +1,21 @@
+# Static analysis of the package. It needs a store with Hyvä Checkout and the main module installed (the classes are analysed
+# together with the Hyvä Checkout and Magento code they extend), so it is run there, not in CI:
+#
+#   vendor/bin/phpstan analyse -c vendor/mage-os/module-customer-custom-attributes-hyva-checkout/phpstan.neon.dist
+#   (or, with the package symlinked from a folder: -c packages/mageos-module-customer-custom-attributes-hyva-checkout/phpstan.neon.dist)
+#
+# Level 5, like the main module. Run it after every Hyvä Checkout update.
+parameters:
+    level: 5
+    paths:
+        - Magewire
+        - Model
+        - Observer
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#Parameter \#\d \$\w+ of method .* expects (string|string\|null|int\|string), Magento\\Framework\\Phrase given#'
+        - '#Call to an undefined method [\w\\]+::(set|get|has|uns|add|can)\w*\(#'
+        - '#(unknown class|invalid type) .*(Factory|Extension\w*)(Interface)?\b#'
+        - '#Constant BP not found#'
+        # Magewire 3 only (Hyvä Checkout 3); on Magewire 1 the attribute is ignored at runtime
+        - '#Attribute class Magewirephp\\Magewire\\Features\\SupportMagewireBackwardsCompatibility\\HandleBackwardsCompatibility does not exist#'

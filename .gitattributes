@@ -1,0 +1,5 @@
+# Left out of the Composer package (git archive / dist).
+/.github            export-ignore
+/dev                export-ignore
+/.gitattributes     export-ignore
+/phpstan.neon.dist  export-ignore

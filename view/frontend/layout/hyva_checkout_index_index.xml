@@ -8,11 +8,15 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <!-- Customer attributes shown in the checkout, one section per position (one-page checkout containers) -->
+        <!-- Each block has a cache_key of its own (no block cache: there is no cache lifetime): Magewire 3 keys a nested component
+             by its block's cache key, which by default comes from the template. The seven sections share one template, so without it
+             a re-render of the parent (an order refused at placement with Hyva_CheckoutV1bc disabled) showed one section everywhere. -->
+        <!-- Customer attributes shown in the checkout, one section per position (Hyvä Checkout's shared component containers, moved into the steps by every checkout type) -->
         <referenceContainer name="checkout.shipping-details.before">
             <block name="mageos.cca.checkout.shipping_address_above"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_shipping_address_above</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingAddressAbove</argument>
                 </arguments>
             </block>
@@ -21,6 +25,7 @@
             <block name="mageos.cca.checkout.shipping_address_below"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml" after="checkout.shipping-details">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_shipping_address_below</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingAddressBelow</argument>
                 </arguments>
             </block>
@@ -29,6 +34,7 @@
             <block name="mageos.cca.checkout.shipping_methods_above"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_shipping_methods_above</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingMethodsAbove</argument>
                 </arguments>
             </block>
@@ -37,6 +43,7 @@
             <block name="mageos.cca.checkout.shipping_methods_below"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_shipping_methods_below</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutShippingMethodsBelow</argument>
                 </arguments>
             </block>
@@ -45,6 +52,7 @@
             <block name="mageos.cca.checkout.payment_above"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_payment_above</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutPaymentAbove</argument>
                 </arguments>
             </block>
@@ -53,6 +61,7 @@
             <block name="mageos.cca.checkout.payment_below"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_payment_below</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutPaymentBelow</argument>
                 </arguments>
             </block>
@@ -61,6 +70,7 @@
             <block name="mageos.cca.checkout.order_summary"
                    template="MageOS_CustomerCustomAttributesHyvaCheckout::checkout/customer-attributes.phtml" after="price-summary.total-segments">
                 <arguments>
+                    <argument name="cache_key" xsi:type="string">mageos_cca_checkout_order_summary</argument>
                     <argument name="magewire" xsi:type="object">MageOSCcaCheckoutOrderSummary</argument>
                 </arguments>
             </block>
