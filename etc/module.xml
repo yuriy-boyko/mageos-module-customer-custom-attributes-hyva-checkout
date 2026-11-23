@@ -7,7 +7,7 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="MageOS_CustomerCustomAttributesHyvaCheckout">
+    <module name="MageOS_CustomerCustomAttributesHyvaCheckout" setup_version="0.1.0">
         <sequence>
             <module name="MageOS_CustomerCustomAttributes"/>
             <module name="Hyva_Checkout"/>

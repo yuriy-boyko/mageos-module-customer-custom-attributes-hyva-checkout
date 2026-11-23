@@ -6,7 +6,7 @@ and the module uses [Semantic Versioning](https://semver.org/). The version alwa
 
 For what the module does, see the [user guide](https://github.com/yuriy-boyko/mageos-module-customer-custom-attributes/blob/main/docs/guide/README.md) of the main module.
 
-## [0.1.0]
+## [0.1.0] - 2026-11-23
 
 Initial version.
 
@@ -26,4 +26,5 @@ Initial version.
 ### Fixed before the first release
 - The form modification listeners accept the extra arguments some Hyvä Checkout components pass (the alternative shipping form
   re-sends `form:updated` with the named arguments `property` and `value`, which ended the update request with an error).
-- `composer.json`: Hyvä Checkout 1.3.15 or newer and Magewire are required; the licence is OSL-3.0 only, like `LICENSE.txt`.
+- `composer.json`: Hyvä Checkout 1.3.15 or newer and Magewire are required, the main package as `^0.1.0`; the licence is OSL-3.0 only,
+  like `LICENSE.txt`. Version 0.1.0 in `composer.json` and as `setup_version` in `etc/module.xml`.
